@@ -1,0 +1,18 @@
+<?php
+	define('INSTAGRAM_APP_ID', '185683468801673');
+	define('INSTAGRAM_APP_SECRET', '2f11d4161bbd801a6918cc1a3d19ce87');
+	define('INSTAGRAM_APP_REDIRECT_URI', 'https://192.168.1.50/github/Instagram/auth/');
+
+
+	// EAACo4M0y1okBAOipY5xxcSzMMRKARQHWkhM5CnxXoD1kZA8MbYL8GosR6cZBiE3N4jKUJx2rpB0Pnsa3N4K1AjAIt7TYfEunaH9zfkUqGdRN8IJoZC72dMm4FpUoSMCSnJVi6Ceo8X7soisnqN4Umw0IcBWE9maeBsruN1xanfSoY1RgcjX3b67XdWZB1JUKqzXKelmk95mpIWqBQYuoPTofNHbnixcZD
+	// EAACo4M0y1okBADCmMtKStyCfcYaONrbhl9O0CxsC3cvZAEbROHudEua5pgnP3hV86QKpnQWipRpGZAnclJy8ZAiTjZCXyjogKyRZCn8PIBDbvzE30KF8ZCQN5AfNbvpyAlKzxeHiecABrrOQhIisY2AWQQ8CHyZCcQiZAASXB0ZANywTsGieElmlHZCpeZCdDHF56JMrhJxGy2CnsXyx46zvI5i
+
+
+	
+// 	curl -i -X GET \
+//  "https://graph.facebook.com/v7.0/603221847243405/accounts?fields=instagram_business_account%2Caccess_token&access_token=185683468801673|2f11d4161bbd801a6918cc1a3d19ce87"
+
+//  curl -i -X GET \
+//  "https://graph.facebook.com/v7.0/oauth/access_token?grant_type=fb_exchange_token&client_id=185683468801673&client_secret=2f11d4161bbd801a6918cc1a3d19ce87&fb_exchange_token=EAACo4M0y1okBAHSJ6fgCKtCvZCV3v5QgbxFrudJ7TYtD82tnHyoIfJ1M967p8gu6aa30hGTTkAatiahMSORsoyZA828ukeukxZADzba1vADVoYFcF0carKO9R8cN0ZAm5TfLUDqBGinb4LAY2VAMfJrvf4aQGsB0jtmeMdjlsnGTjCNKbFdsJ36K8tDcwKZChTFSMdNejJm7CVqrGTile&access_token=EAACo4M0y1okBAHSJ6fgCKtCvZCV3v5QgbxFrudJ7TYtD82tnHyoIfJ1M967p8gu6aa30hGTTkAatiahMSORsoyZA828ukeukxZADzba1vADVoYFcF0carKO9R8cN0ZAm5TfLUDqBGinb4LAY2VAMfJrvf4aQGsB0jtmeMdjlsnGTjCNKbFdsJ36K8tDcwKZChTFSMdNejJm7CVqrGTile"
+
+	
