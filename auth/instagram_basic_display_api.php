@@ -5,20 +5,26 @@
 		private $_appId = INSTAGRAM_APP_ID;
 		private $_appSecret = INSTAGRAM_APP_SECRET;
 		private $_redirectUrl = INSTAGRAM_APP_REDIRECT_URI;
+		private $_instagramTokenStore = INSTAGRAM_TOKEN_STORE;
 		private $_getCode = '';
 		private $_apiBaseUrl = 'https://api.instagram.com/';
 		private $_graphBaseUrl = 'https://graph.instagram.com/';
+		private $_graphFbBaseUrl = 'https://graph.facebook.com/v7.0/';
 		private $_userAccessToken = '';
 		private $_userAccessTokenExpires = '';
+		private $_instagramBusinessAccount = '';
+		private $_username = '';
 
 		public $authorizationUrl = '';
 		public $hasUserAccessToken = false;
 		public $userId = '';
+		public $_feed = null;
+
 
 		function __construct( $params ) {
 			// save instagram code
 			$this->_getCode = $params['get_code'];
-
+			$this->_username = $params['username'];
 			// get an access token
 			$this->_setUserInstagramAccessToken( $params );
 
@@ -47,21 +53,35 @@
 		}
 
 		private function _setUserInstagramAccessToken( $params ) {
-			if ( isset($params['access_token']) ) { // we have an access token
-				$this->_userAccessToken = $params['access_token'];
-				$this->hasUserAccessToken = true;
-				$this->userId = $params['user_id'];
-			} elseif ( $params['get_code'] ) { // try and get an access token
-				$userAccessTokenResponse = $this->_getUserAccessToken();
-				$this->_userAccessToken = $userAccessTokenResponse['access_token'];
-				$this->hasUserAccessToken = true;
-				$this->userId = $userAccessTokenResponse['user_id'];
+			// if ( isset($params['access_token']) ) { // we have an access token
+			// 	$this->_userAccessToken = $params['access_token'];
+			// 	$this->hasUserAccessToken = true;
+			// 	$this->userId = $params['user_id'];
+			// } elseif ( $params['get_code'] ) { // try and get an access token
+			// 	$userAccessTokenResponse = $this->_getUserAccessToken();
+			// 	$this->_userAccessToken = $userAccessTokenResponse['access_token'];
+			// 	$this->hasUserAccessToken = true;
+			// 	$this->userId = $userAccessTokenResponse['user_id'];
 
-				// get long lived access token
-				$longLivedAccessTokenResponse = $this->_getLongLivedUserAccessToken();
-				$this->_userAccessToken = $longLivedAccessTokenResponse['access_token'];
+			// 	// get long lived access token
+			// 	$longLivedAccessTokenResponse = $this->_getLongLivedUserAccessToken();
+			// 	$this->_userAccessToken = $longLivedAccessTokenResponse['access_token'];
+			// 	$this->_userAccessTokenExpires = $longLivedAccessTokenResponse['expires_in'];
+			// }
+			$infos = $this->_getStore();
+			$this->_userAccessToken = $infos['access_token'];
+			$longLivedAccessTokenResponse = $this->_getLongLivedUserAccessToken();
+			$this->_setStore($longLivedAccessTokenResponse);
+			$this->_userAccessToken = $longLivedAccessTokenResponse['access_token'];
+			if(isset($longLivedAccessTokenResponse['expires_in'])) {
 				$this->_userAccessTokenExpires = $longLivedAccessTokenResponse['expires_in'];
+			} else {
+				$this->_userAccessTokenExpires = "NC";
 			}
+			$accounts = $this->_getMyAccounts();
+			$this->_setInstagramBusinessAccount($accounts);
+			// echo $this->_instagramBusinessAccount;die();
+			$this->_feed = $this->_getUserFeed();
 		}
 
 		private function _getUserAccessToken() {
@@ -83,11 +103,13 @@
 
 		private function _getLongLivedUserAccessToken() {
 			$params = array(
-				'endpoint_url' => $this->_graphBaseUrl . 'access_token',
+				'endpoint_url' => $this->_graphFbBaseUrl . 'oauth/access_token',
 				'type' => 'GET',
 				'url_params' => array(
+					'client_id' => $this->_appId,
 					'client_secret' => $this->_appSecret,
-					'grant_type' => 'ig_exchange_token',
+					'grant_type' => 'fb_exchange_token',
+					'fb_exchange_token' => $this->_userAccessToken
 				)
 			);
 
@@ -106,6 +128,48 @@
 
 			$response = $this->_makeApiCall( $params );
 			return $response;
+		}
+
+		public function _getMyAccounts()
+		{
+			$params = array(
+				'endpoint_url' => $this->_graphFbBaseUrl . 'me/accounts',
+				'type' => 'GET',
+				'url_params' => array(
+					'fields' => 'instagram_business_account,access_token',
+				)
+			);
+
+			$response = $this->_makeApiCall( $params );
+			return $response;
+		}
+
+		private function _setInstagramBusinessAccount($response)
+		{
+			for ($i=0; $i < count($response['data']); $i++) { 
+				$account = $response['data'][$i];
+				if(isset($account["instagram_business_account"])) {
+					$this->_instagramBusinessAccount = $account["instagram_business_account"]['id'];
+				}
+			}
+		}
+
+		public function _getUserFeed()
+		{
+			if($this->_instagramBusinessAccount != "") {
+				$params = array(
+					'endpoint_url' => $this->_graphFbBaseUrl . $this->_instagramBusinessAccount,
+					'type' => 'GET',
+					'url_params' => array(
+						'fields' => 'business_discovery.username('.$this->_username.'){followers_count,media_count,media{comments_count,like_count,media_url,caption,timestamp}}',
+					)
+				);
+	
+				$response = $this->_makeApiCall( $params );
+				return $response;
+			} else {
+				return null;
+			}
 		}
 
 		public function getPageTest() {
@@ -207,5 +271,19 @@
 			} else {
 				return $responseArray;
 			}
+		}
+
+		public function _getStore() {
+			$string = file_get_contents($this->_instagramTokenStore);
+			$infos = json_decode($string, true);
+			return $infos;
+		}
+
+		private function _setStore($response)
+		{
+			$fp = fopen($this->_instagramTokenStore, 'w');
+			fwrite($fp, json_encode($response));
+			fclose($fp);
+			return true;
 		}
 	}
