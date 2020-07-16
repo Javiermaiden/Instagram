@@ -3,6 +3,7 @@
 	
 	$params = array(
 		'get_code' => isset($_GET['code']) ? $_GET['code'] : '',
+		'username' => isset($_GET['username']) ? $_GET['username'] : ''
 	);
 	$ig = new instagram_basic_display_api($params);
 ?>
@@ -27,5 +28,13 @@
 	<a href="<?php echo $ig->authorizationUrl; ?>">
 		Authorize w/Instagram
 	</a>
+	<?php
+		// $infos = $ig->_getStore();
+		// echo "<br>".$infos['access_token']."<br>";
+		// var_dump($ig->_feed);
+	?>
+	<h6>
+		<!-- Expires in : <?php echo ceil($ig->getUserAccessTokenExpires()/86400); ?> days -->
+	</h6>
 <?php endif; ?>
 <!-- ?fields=business_discovery.username(javierbarrancoalmiron){followers_count,media_count,media{comments_count,like_count,media_url}} -->
