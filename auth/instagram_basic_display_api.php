@@ -161,7 +161,7 @@
 					'endpoint_url' => $this->_graphFbBaseUrl . $this->_instagramBusinessAccount,
 					'type' => 'GET',
 					'url_params' => array(
-						'fields' => 'business_discovery.username('.$this->_username.'){followers_count,media_count,media{comments_count,like_count,media_url,caption,timestamp}}',
+						'fields' => 'business_discovery.username('.$this->_username.'){name,username,ig_id,id,follows_count,followers_count,media_count,profile_picture_url,media{permalink,timestamp,media_url,media_type,caption,comments_count,like_countl}}',
 					)
 				);
 	
